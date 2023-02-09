@@ -33,6 +33,14 @@ pipeline {
            }
            stages {
               stage('Database docker build') {
+                stage('Security scanning') {
+            steps {
+                  withCredentials([usernamePassword(credentialsId: 'kmerrell-harbor-auth', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                      echo "Scanning $APP_IMAGE_NAME image"
+                      sh 'python harbor_scanner.py -i $APP_IMAGE_NAME -r $HARBOR_REGISTRY -p $HARBOR_PROJECT -c ${USERNAME}:${PASSWORD}'
+                  }
+            }
+        }
                   steps {
                       echo "Building database image"
                       //TODO: build docker image & push to Harbor
